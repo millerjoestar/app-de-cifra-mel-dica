@@ -1,4 +1,6 @@
 streamlit
 pillow
 pypdfium2
-google-genai
+opencv-python-headless
+music21
+numpy
