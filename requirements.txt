@@ -2,5 +2,4 @@ streamlit
 pillow
 pypdfium2
 opencv-python-headless
-music21
 numpy
