@@ -16,7 +16,7 @@ st.write("Anexe a imagem ou PDF da sua partitura para extrair o tom, notas e cif
 
 # Barra lateral para configuração da chave de API
 st.sidebar.header("⚙️ Configurações")
-api_key = st.sidebar.text_input("Chave de API (Gemini/OpenAI):", type="password")
+api_key = st.sidebar.text_input("Chave de API (Gemini):", type="password")
 
 # Upload do arquivo
 uploaded_file = st.file_uploader(
@@ -37,8 +37,8 @@ if uploaded_file is not None:
         # Se for imagem direta
         image_to_process = Image.open(uploaded_file)
 
-    # Exibe a partitura carregada
-    st.image(image_to_process, caption="Partitura Carregada", use_column_width=True)
+    # Exibe a partitura carregada (usando use_container_width=True)
+    st.image(image_to_process, caption="Partitura Carregada", use_container_width=True)
 
     # Botão para processar
     if st.button("🚀 Analisar Partitura e Gerar Cifra", type="primary"):
@@ -64,7 +64,7 @@ if uploaded_file is not None:
                     2. **Cifra Melódica / Sequência de Notas**:
                        - Escreva a sequência exata de notas da melodia principal (use notação em português: Dó, Ré, Mi, Fá, Sol, Lá, Si ou cifras C, D, E, F, G, A, B).
                        - Organize a transcrição por compassos.
-                       - Destaque o ritmo/duração básica (ex: seminimas, colcheias) se relevante.
+                       - Destaque o ritmo/duração básica (ex: semínimas, colcheias) se relevante.
                     """
 
                     # Executa a chamada do modelo multimodal
