@@ -40,35 +40,47 @@ if uploaded_file is not None:
             st.error("Chave de API não configurada nos Secrets do Streamlit Cloud.")
         else:
             with st.spinner("Lendo a partitura, claves e acidentes..."):
-                try:
-                    client = genai.Client(api_key=api_key)
-                    
-                    prompt = """
-                    Analise com precisão a imagem/PDF desta partitura musical e extraia a cifra melódica completa.
+                client = genai.Client(api_key=api_key)
+                
+                prompt = """
+                Analise com precisão a imagem/PDF desta partitura musical e extraia a cifra melódica completa.
 
-                    Formate a resposta rigorosamente assim:
-                    1. **Informações Gerais**:
-                       - Título da Música:
-                       - Clave e Instrumento:
-                       - Tonalidade Identificada (ex: Ré Maior / Dó# e Fá# na armadura):
+                Formate a resposta rigorosamente assim:
+                1. **Informações Gerais**:
+                   - Título da Música:
+                   - Clave e Instrumento:
+                   - Tonalidade Identificada (ex: Ré Maior / Dó# e Fá# na armadura):
 
-                    2. **Cifra Melódica (Texto/Bloco de Código)**:
-                       - Transcreva todas as notas da melodia principal na sequência exata em que aparecem.
-                       - Use notas em português (do, re, mi, fa, sol, la, si) ou cifras (C, D, E, F, G, A, B).
-                       - Marque acidentes claramente (ex: fa#, do#, sib).
-                       - Destaque notas mais agudas com letras MAIÚSCULAS ou notação de oitava (ex: RÉ, MI).
-                       - Organize a transcrição dividindo as frases por compasso usando a barra vertical ' | '.
-                    """
+                2. **Cifra Melódica (Texto/Bloco de Código)**:
+                   - Transcreva todas as notas da melodia principal na sequência exata em que aparecem.
+                   - Use notas em português (do, re, mi, fa, sol, la, si) ou cifras (C, D, E, F, G, A, B).
+                   - Marque acidentes claramente (ex: fa#, do#, sib).
+                   - Destaque notas mais agudas com letras MAIÚSCULAS ou notação de oitava (ex: RÉ, MI).
+                   - Organize a transcrição dividindo as frases por compasso usando a barra vertical ' | '.
+                """
 
-                    # Modelo atualizado conforme exigência do servidor
-                    response = client.models.generate_content(
-                        model='gemini-3.8-flash',
-                        contents=[image_to_process, prompt]
-                    )
+                # Lista de modelos em ordem de preferência (Fallback)
+                modelos = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+                sucesso = False
 
-                    st.success("Análise concluída com sucesso!")
-                    st.markdown("---")
-                    st.markdown(response.text)
+                for modelo in modelos:
+                    try:
+                        response = client.models.generate_content(
+                            model=modelo,
+                            contents=[image_to_process, prompt]
+                        )
+                        st.success("Análise concluída com sucesso!")
+                        st.markdown("---")
+                        st.markdown(response.text)
+                        sucesso = True
+                        break  # Se funcionou, sai do loop
+                    except Exception as err:
+                        if "503" in str(err) or "UNAVAILABLE" in str(err):
+                            st.warning(f"O modelo {modelo} está sobrecarregado no momento. Alternando para o modelo de backup...")
+                            continue
+                        else:
+                            st.error(f"Erro ao processar com o modelo {modelo}: {err}")
+                            break
 
-                except Exception as e:
-                    st.error(f"Erro ao processar a imagem: {e}")
+                if not sucesso:
+                    st.error("Os servidores do Google estão temporariamente sobrecarregados. Por favor, aguarde alguns segundos e tente novamente.")
