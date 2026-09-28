@@ -1,0 +1,4 @@
+streamlit
+pillow
+pypdfium2
+google-genai
