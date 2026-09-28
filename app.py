@@ -38,11 +38,8 @@ def analisar_partitura_nativa(pil_image):
     num_lines = np.sum(detected_lines > 0)
 
     # Estrutura teórica com music21
-    # Exemplo de criação de estrutura de tom usando teoria nativa
     tom_estimado = music21.key.Key('C')  # Dó Maior como padrão inicial
     
-    # Detecção básica de acidentes baseada na densidade de pixels no início das linhas
-    # (Pode ser expandida para mapear sustenidos/bemóis específicos)
     relatorio = {
         "clave": "Clave de Sol (Detectada padrão)",
         "tom": f"{tom_estimado.tonic.name} {tom_estimado.mode.capitalize()} ({tom_estimado.pitchNames})",
