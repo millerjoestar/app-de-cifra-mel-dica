@@ -14,7 +14,7 @@ st.set_page_config(
 st.title("🎵 Leitor de Partituras & Cifra Melódica")
 st.write("Anexe a imagem ou PDF da sua partitura para extrair a cifra melódica exata e o tom!")
 
-# Tenta carregar a chave via Secrets do Streamlit Cloud
+# Carrega a chave via Secrets do Streamlit Cloud
 api_key = st.secrets.get("GEMINI_API_KEY") if "GEMINI_API_KEY" in st.secrets else None
 
 # Upload do arquivo
@@ -60,8 +60,9 @@ if uploaded_file is not None:
                        - Organize a transcrição dividindo as frases por compasso usando a barra vertical ' | '.
                     """
 
+                    # Modelo atualizado para gemini-1.5-flash
                     response = client.models.generate_content(
-                        model='gemini-2.5-flash',
+                        model='gemini-1.5-flash',
                         contents=[image_to_process, prompt]
                     )
 
