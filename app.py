@@ -60,9 +60,9 @@ if uploaded_file is not None:
                        - Organize a transcrição dividindo as frases por compasso usando a barra vertical ' | '.
                     """
 
-                    # Modelo atualizado para gemini-1.5-flash
+                    # Chamada com o modelo gemini-2.0-flash
                     response = client.models.generate_content(
-                        model='gemini-1.5-flash',
+                        model='gemini-2.0-flash',
                         contents=[image_to_process, prompt]
                     )
 
