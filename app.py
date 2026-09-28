@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import pypdfium2 as pdfium
-import os
+import time
 from google import genai
 
 # Configuração da página
@@ -59,28 +59,28 @@ if uploaded_file is not None:
                    - Organize a transcrição dividindo as frases por compasso usando a barra vertical ' | '.
                 """
 
-                # Lista de modelos em ordem de preferência (Fallback)
-                modelos = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+                # Loop de retentativa para contornar instabilidades temporárias (503)
+                max_tentativas = 3
                 sucesso = False
 
-                for modelo in modelos:
+                for tentativa in range(1, max_tentativas + 1):
                     try:
                         response = client.models.generate_content(
-                            model=modelo,
+                            model='gemini-3.8-flash',
                             contents=[image_to_process, prompt]
                         )
                         st.success("Análise concluída com sucesso!")
                         st.markdown("---")
                         st.markdown(response.text)
                         sucesso = True
-                        break  # Se funcionou, sai do loop
+                        break
                     except Exception as err:
-                        if "503" in str(err) or "UNAVAILABLE" in str(err):
-                            st.warning(f"O modelo {modelo} está sobrecarregado no momento. Alternando para o modelo de backup...")
-                            continue
+                        if ("503" in str(err) or "UNAVAILABLE" in str(err)) and tentativa < max_tentativas:
+                            st.warning(f"Servidor ocupado. Tentativa {tentativa} de {max_tentativas}... Aguardando 3 segundos.")
+                            time.sleep(3)
                         else:
-                            st.error(f"Erro ao processar com o modelo {modelo}: {err}")
+                            st.error(f"Erro ao processar: {err}")
                             break
 
-                if not sucesso:
-                    st.error("Os servidores do Google estão temporariamente sobrecarregados. Por favor, aguarde alguns segundos e tente novamente.")
+                if not sucesso and "response" not in locals():
+                    st.error("Servidores indisponíveis no momento. Tente novamente em alguns instantes.")
