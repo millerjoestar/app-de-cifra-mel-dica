@@ -37,12 +37,13 @@ def analisar_partitura_nativa(pil_image):
     detected_lines = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel_line)
     num_lines = np.sum(detected_lines > 0)
 
-    # Estrutura teórica com music21
+    # Estrutura teórica com music21 (Corrigido para usar .pitches)
     tom_estimado = music21.key.Key('C')  # Dó Maior como padrão inicial
+    notas_escala = ", ".join([p.name for p in tom_estimado.pitches])
     
     relatorio = {
         "clave": "Clave de Sol (Detectada padrão)",
-        "tom": f"{tom_estimado.tonic.name} {tom_estimado.mode.capitalize()} ({tom_estimado.pitchNames})",
+        "tom": f"{tom_estimado.tonic.name} {tom_estimado.mode.capitalize()} ({notas_escala})",
         "armadura": "Sem acidentes identificados (C-Major / A-Minor)",
         "linhas_processadas": int(num_lines // 100)
     }
